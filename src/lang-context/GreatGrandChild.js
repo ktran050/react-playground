@@ -1,0 +1,25 @@
+import React, { Component } from "react";
+import languageSpecificCopy from "./languageSpecificCopy";
+import LanguageContext from "./LanguageContext";
+
+class GreatGrandChild extends Component {
+  static contextType = LanguageContext;
+  render() {
+    console.log(this.context.contextValue.lang);
+    const copy = languageSpecificCopy[this.context.contextValue.lang] || {};
+    return (
+      <section>
+        <h2>{copy.title}</h2>
+        <p>{copy.body}</p>
+        <button onClick={() => this.context.contextValue.setLang("klingon")}>
+          Klingon! {/* yes I know it's a vulcan salute but star-trek */}
+          <span role="img" aria-label="klingon">
+            🖖
+          </span>
+        </button>
+      </section>
+    );
+  }
+}
+
+export default GreatGrandChild;
