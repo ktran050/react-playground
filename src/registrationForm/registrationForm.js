@@ -1,4 +1,5 @@
 import React from "react";
+import ValidationError from "./ValidationError";
 
 class RegistrationForm extends React.Component {
   constructor(props) {
@@ -6,14 +7,43 @@ class RegistrationForm extends React.Component {
     this.state = {
       name: {
         value: " ",
+        touched: false,
       },
       password: {
         value: " ",
+        touched: false,
       },
       repeatPassword: {
         value: " ",
+        touched: false,
       },
     };
+  }
+  validateName() {
+    const name = this.state.name.value.trim();
+    if (name.length === 0) {
+      return "Name is required";
+    } else if (name.length < 3) {
+      return "Name must be at least 3 characters long";
+    } else return;
+  }
+  validatePassword() {
+    const password = this.state.password.value.trim();
+    if (password.length === 0) {
+      return "Password is required";
+    } else if (password.length < 6 || password.length > 72) {
+      return "Password must be between 6 and 72 characters long";
+    } else if (!password.match(/[0-9]/)) {
+      return "Password must contain at least one number";
+    }
+  }
+  validateRepeatPassword() {
+    const repeatPassword = this.state.repeatPassword.value.trim();
+    const password = this.state.password.value.trim();
+
+    if (repeatPassword !== password) {
+      return "Passwords do not match";
+    }
   }
   handleSubmit(event) {
     event.preventDefault();
@@ -23,13 +53,13 @@ class RegistrationForm extends React.Component {
     console.log("repeatPassword", repeatPassword);
   }
   updateName(name) {
-    this.setState({ name: { value: name } });
+    this.setState({ name: { value: name, touched: true } });
   }
   updatePassword(password) {
-    this.setState({ password: { value: password } });
+    this.setState({ password: { value: password, touched: true } });
   }
   updateRepeatPassword(repeatPassword) {
-    this.setState({ repeatPassword: { value: repeatPassword } });
+    this.setState({ repeatPassword: { value: repeatPassword, touched: true } });
   }
   render() {
     return (
@@ -50,6 +80,9 @@ class RegistrationForm extends React.Component {
             id="name"
             onChange={(event) => this.updateName(event.target.value)}
           />
+          {this.state.name.touched && (
+            <ValidationError message={this.validateName()} />
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="password">Password *</label>
@@ -63,6 +96,9 @@ class RegistrationForm extends React.Component {
           <div className="registration__hint">
             6 to 72 characters, must include a number
           </div>
+          {this.state.password.touched && (
+            <ValidationError message={this.validatePassword()} />
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="repeatPassword">Repeat Password *</label>
@@ -73,13 +109,24 @@ class RegistrationForm extends React.Component {
             id="repeatPassword"
             onChange={(event) => this.updateRepeatPassword(event.target.value)}
           />
+          {this.state.repeatPassword.touched && (
+            <ValidationError message={this.validateRepeatPassword()} />
+          )}
         </div>
 
         <div className="registration__button__group">
           <button type="reset" className="registration__button">
             Cancel
           </button>
-          <button type="submit" className="registration__button">
+          <button
+            type="submit"
+            className="registration__button"
+            disabled={
+              this.validateName() ||
+              this.validatePassword() ||
+              this.validateRepeatPassword()
+            }
+          >
             Save
           </button>
         </div>
